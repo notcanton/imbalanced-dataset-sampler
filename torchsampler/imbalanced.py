@@ -56,11 +56,14 @@ class ImbalancedDatasetSampler(torch.utils.data.sampler.Sampler):
         elif isinstance(dataset, torchvision.datasets.DatasetFolder):
             return dataset.samples[:][1]
         elif isinstance(dataset, torch.utils.data.Subset):
-            return dataset.dataset.imgs[:][1]
+            return self._get_custom_labels(dataset)
         elif isinstance(dataset, torch.utils.data.Dataset):
             return dataset.get_labels()
         else:
             raise NotImplementedError
+            
+    def _get_custom_labels(self, dataset): # get labels from arbitrary dataset
+        return [y for _, y in dataset]
 
     def __iter__(self):
         return (self.indices[i] for i in torch.multinomial(self.weights, self.num_samples, replacement=True))
